@@ -1,0 +1,64 @@
+--------------------------
+-- | Geoff Huang      | --
+-- | ghuang6@ucsc.edu | --
+--------------------------
+
+-------------------------------------------------------------------------------
+-- DO NOT MODIFY THIS SEGMENT
+-------------------------------------------------------------------------------
+
+let ZERO  = \f x -> x
+let ONE   = \f x -> f x
+let TWO   = \f x -> f (f x)
+let THREE = \f x -> f (f (f x))
+let FOUR  = \f x -> f (f (f (f x)))
+
+let SUC   = \n f x -> f (n f x)  -- "successor" (same thing as INC or increment)
+let ADD   = \n m -> n SUC m
+let MUL   = \n m -> n (ADD m) ZERO
+
+-------------------------------------------------------------------------------
+-- YOU SHOULD ONLY MODIFY THE TEXT BELOW, JUST THE PARTS MARKED AS COMMENTS
+-------------------------------------------------------------------------------
+
+-- note: as before, alpha renaming is not necessary in any of these reduction steps
+-- although you could argue it helps readability, so I left them in
+
+eval suc_one :
+  SUC ONE
+  =d> (\n f x -> f (n f x)) (\f x -> f x)
+  =a> (\n f x -> f (n f x)) (\a b -> a b)
+  =b> \f x -> f ((\a b -> a b) f x)
+  =b> \f x -> f ((\b -> f b) x)
+  =b> \f x -> f (f x)
+  =d> TWO
+
+eval add_one_zero :
+  ADD ONE ZERO
+  =d> (\n m -> n SUC m) ONE ZERO
+  =b> (\m -> ONE SUC m) ZERO
+  =b> ONE SUC ZERO
+  =d> (\f x -> f x) SUC ZERO
+  =b> (\x -> SUC x) ZERO
+  =b> SUC ZERO
+  =d> (\n f x -> f (n f x)) (\f x -> x)
+  =a> (\n f x -> f (n f x)) (\a b -> b)
+  =b> \f x -> f ((\a b -> b) f x)
+  =b> \f x -> f ((\b -> b) x)
+  =b> \f x -> f x
+  =d> ONE
+
+eval add_one_two :
+  ADD ONE TWO 
+  =d> (\n m -> n SUC m) ONE TWO
+  =b> (\m -> ONE SUC m) TWO
+  =b> ONE SUC TWO
+  =d> (\f x -> f x) SUC TWO
+  =b> (\x -> SUC x) TWO
+  =b> SUC TWO
+  =d> (\n f x -> f (n f x)) (\f x -> f (f x))
+  =a> (\n f x -> f (n f x)) (\a b -> a (a b))
+  =b> \f x -> f ((\a b -> a (a b)) f x)
+  =b> \f x -> f ((\b -> f (f b)) x)
+  =b> \f x -> f (f (f x))
+  =d> THREE
